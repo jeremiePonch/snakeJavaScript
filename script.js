@@ -111,8 +111,8 @@ window.onload = () => {
         draw(){
             ctx.save();
             ctx.fillStyle = "#ff0000";
-            for(let i=0; i<this.body.length; i++){
-                drawBlock(ctx, this.body[i]);
+            for(let block of this.body){
+                drawBlock(ctx, block);
             }
             ctx.restore();
         };
@@ -175,7 +175,7 @@ window.onload = () => {
             let wallCollision = false;
             let snakeCollision = false;
             const head = this.body[0];
-            const rest = this.body.slice(1);
+            const rest = this.body.slice(1); // corps du serpent [[4,3], [2,3]]
             const headX = head[0];
             const headY = head[1];
             const minX = 0;
@@ -191,8 +191,8 @@ window.onload = () => {
 
 
 
-            for(let i=0; i<rest.length; i++){
-                if(headX === rest[i][0] && headY === rest[i][1] ){
+            for(let block of rest){
+                if(headX === block[0] && headY === block[1] ){
                     snakeCollision = true;
                 }
             }
@@ -242,8 +242,8 @@ window.onload = () => {
 
         isOnSnake(snakeToCkeck){
             let isOnSnake = false;
-            for(let i=0; i<snakeToCkeck.body.length; i++){
-                if(this.position[0] === snakeToCkeck.body[i][0] && this.position[1] === snakeToCkeck.body[i][1])
+            for(let block of snakeToCkeck.body){
+                if(this.position[0] === block[0] && this.position[1] === block[1])
                     isOnSnake = true;
             }
 
