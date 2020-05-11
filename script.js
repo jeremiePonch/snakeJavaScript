@@ -96,9 +96,11 @@ window.onload = () => {
     }
 
     const drawBlock = (ctx, position ) => {
-        const x = position[0] * blockSize;
-        const y = position[1] * blockSize;
-        ctx.fillRect(x, y, blockSize, blockSize)
+        // const x = position[0] * blockSize;
+        // const y = position[1] * blockSize;
+
+        const [x, y] = position;                                        //Ajout du destructuring
+        ctx.fillRect(x*blockSize, y*blockSize, blockSize, blockSize)    //Ajout du destructuring
     }
 
     class Snake {
@@ -174,10 +176,12 @@ window.onload = () => {
         checkCollision(){
             let wallCollision = false;
             let snakeCollision = false;
-            const head = this.body[0];
-            const rest = this.body.slice(1); // corps du serpent [[4,3], [2,3]]
-            const headX = head[0];
-            const headY = head[1];
+            // const head = this.body[0];
+            // const rest = this.body.slice(1); // corps du serpent [[4,3], [2,3]]
+            // const headX = head[0];
+            // const headY = head[1];
+            const[head, ...rest] = this.body;               //Ajout du destructuring
+            const[headX, headY] = head;                     //Ajout du destructuring
             const minX = 0;
             const minY = 0;
             const maxX = blockWidth - 1;
