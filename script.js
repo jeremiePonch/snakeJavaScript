@@ -34,7 +34,7 @@ window.onload = () => {
 
     const launch = () =>{
         snaky = new Snake([[5,4] , [4,4], [3,4], [2,4]], 'right');
-        apple = new Apple([10,10]);
+        apple = new Apple();
         score = 0;
         delay = 100; 
         clearTimeout(timeOut); // fonction qui remet setTimeout à 0
@@ -216,7 +216,7 @@ window.onload = () => {
     }
 
     class Apple{
-        constructor(position){
+        constructor(position = [10,10]){
             this.position = position; 
         }
         
