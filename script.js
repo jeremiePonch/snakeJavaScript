@@ -1,20 +1,77 @@
 window.onload = () => {
 
-    const canvasWidth = 900;
-    const canvasHeight = 600;
-    const blockSize = 30;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const blockWidth = canvasWidth/blockSize;
-    const blockHeight = canvasHeight/blockSize;
-    const xCenter = canvasWidth/2;
-    const yCenter = canvasHeight/2;
 
-    let delay;
-    let snaky;
-    let apple;
-    let score;
-    let timeOut;
+
+    class Game {
+        constructor(canvasWidth = 900, canvasHeight = 600){
+            this.canvasWidth = canvasWidth;
+            this.canvasHeight = canvasHeight;
+            this.blockSize = 30;
+            this.canvas = document.createElement('canvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.blockWidth = this.canvasWidth/this.blockSize;
+            this.blockHeight = this.canvasHeight/this.blockSize;
+            this.xCenter = this.canvasWidth/2;
+            this.yCenter = this.canvasHeight/2;
+        
+            this.delay;
+            this.snaky;
+            this.apple;
+            this.score;
+            this.timeOut;
+        }
+
+        init(){
+            this.canvas.width = this.canvasWidth;
+            this.canvas.height = this.canvasHeight;
+            this.canvas.style.border = "30px solid grey";
+            this.canvas.style.margin = "50px auto";
+            this.canvas. style.display = "block";
+            this.canvas.style.backgroundColor = "#ddd";
+            document.body.appendChild(this.canvas);
+    
+            this.launch();
+            //refreshCanvas();
+        }
+    
+    
+        launch(){
+            this.snaky = new Snake('right', [5,4] , [4,4], [3,4], [2,4]);
+            this.apple = new Apple();
+            this.score = 0;
+            this.delay = 100; 
+            clearTimeout(this.timeOut); // fonction qui remet setTimeout à 0
+            this.refreshCanvas();
+        }
+    
+        refreshCanvas(){
+    
+            this.snaky.advance();
+            if(this.snaky.checkCollision(this.blockWidth, this.blockHeight)){
+                Drawing.gameOver(this.ctx, this.xCenter, this.yCenter);
+            }else{
+        
+                if(this.snaky.isEatingeApple(this.apple)){
+                    this.score++;
+                    do{
+                        this.apple.setNewPosition(this.blockWidth, this.blockHeight);
+                        
+                    }while( this.apple.isOnSnake(this.snaky));
+    
+                    if(this.score%5 === 0 &&  this.score !=0) this.delay /= 2;
+                }
+    
+                this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                Drawing.drawScore(this.ctx, this.xCenter, this.yCenter, this.score);
+                Drawing.drawSnack(this.ctx, this.blockSize, this.snaky);
+                Drawing.drawApple(this.ctx, this.blockSize, this.apple)
+                this.timeOut = setTimeout(this.refreshCanvas.bind(this), this.delay);    // setTimeout fonction qui permet de relancer une fonction 
+                                                                                    // j'utilise le bind car je veux garder les proprieté de mon objet pas celui de l'objet Window
+            }
+    
+        }
+
+    }
 
 
     class Snake {
@@ -77,7 +134,7 @@ window.onload = () => {
             }
         };
 
-        checkCollision(){
+        checkCollision(blockWidth, blockHeight){
             let wallCollision = false;
             let snakeCollision = false;
             // const head = this.body[0];
@@ -128,19 +185,8 @@ window.onload = () => {
             this.position = position; 
         }
         
-        draw(){
-            const radius = blockSize/2;
-            const x = this.position[0]*blockSize + radius;
-            const y = this.position[1]*blockSize + radius;
-            ctx.save();
-            ctx.fillStyle="#33cc33";
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, Math.PI*2, true);
-            ctx.fill();
-            ctx.restore();
-        };
 
-        setNewPosition(){
+        setNewPosition(blockWidth, blockHeight){
             const newX = Math.round(Math.random() * blockWidth - 1);
             const newY = Math.round(Math.random() * blockHeight - 1);
             console.log(this.position);
@@ -219,59 +265,12 @@ window.onload = () => {
         }
 
     }
-    
 
 
-    const init = () => {
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        canvas.style.border = "30px solid grey";
-        canvas.style.margin = "50px auto";
-        canvas. style.display = "block";
-        canvas.style.backgroundColor = "#ddd";
-        document.body.appendChild(canvas);
-
-        launch();
-        //refreshCanvas();
-    }
-
-    
-
-    const launch = () =>{
-        snaky = new Snake('right', [5,4] , [4,4], [3,4], [2,4]);
-        apple = new Apple();
-        score = 0;
-        delay = 100; 
-        clearTimeout(timeOut); // fonction qui remet setTimeout à 0
-        refreshCanvas();
-    }
-
-    const refreshCanvas = () => {
-
-        snaky.advance();
-        if(snaky.checkCollision()){
-            Drawing.gameOver(ctx, xCenter, yCenter);
-        }else{
-    
-            if(snaky.isEatingeApple(apple)){
-                score++;
-                do{
-                    apple.setNewPosition();
-                    
-                }while( apple.isOnSnake(snaky));
-
-                if(score%5 === 0 &&  score !=0) delay /= 2;
-            }
-
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-            Drawing.drawScore(ctx, xCenter, yCenter, score);
-            Drawing.drawSnack(ctx, blockSize, snaky);
-            Drawing.drawApple(ctx, blockSize, apple)
-            timeOut = setTimeout(refreshCanvas, delay); // setTimeout fonction qui permet de relancer une fonction
-        }
-
-    }
-
+    let myGame = new Game();
+    myGame.init();
+    let myGame2 = new Game();
+    myGame2.init();
 
     document.onkeydown = e =>{
         const key = e.keyCode;
@@ -279,7 +278,8 @@ window.onload = () => {
 
         switch(key){
             case 32:
-                launch();
+                myGame.launch();
+                // myGame2.launch();
                 return; 
             case 37:
                 newDirection = "left";
@@ -298,10 +298,10 @@ window.onload = () => {
         }
 
         console.log("newDirection : " + newDirection);
-        snaky.setDirection(newDirection);
+        myGame.snaky.setDirection(newDirection);
+        // myGame2.snaky.setDirection(newDirection);
 
     }
 
-    init();
 
 }
