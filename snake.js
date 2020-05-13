@@ -53,7 +53,7 @@ export default class Snake {
                 throw("Invalid direction");
         }
 
-        if(allowedDirection.indexOf(newDirection) > -1){
+        if(allowedDirection.includes(newDirection)){
             this.direction = newDirection;
         }
     };
