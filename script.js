@@ -17,92 +17,6 @@ window.onload = () => {
     let timeOut;
 
 
-    const init = () => {
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        canvas.style.border = "30px solid grey";
-        canvas.style.margin = "50px auto";
-        canvas. style.display = "block";
-        canvas.style.backgroundColor = "#ddd";
-        document.body.appendChild(canvas);
-
-        launch();
-        //refreshCanvas();
-    }
-
-    
-
-    const launch = () =>{
-        snaky = new Snake('right', [5,4] , [4,4], [3,4], [2,4]);
-        apple = new Apple();
-        score = 0;
-        delay = 100; 
-        clearTimeout(timeOut); // fonction qui remet setTimeout à 0
-        refreshCanvas();
-    }
-
-    const refreshCanvas = () => {
-
-        snaky.advance();
-        if(snaky.checkCollision()){
-            gameOver();
-        }else{
-    
-            if(snaky.isEatingeApple(apple)){
-                score++;
-                do{
-                    apple.setNewPosition();
-                    
-                }while( apple.isOnSnake(snaky));
-
-                if(score%5 === 0 &&  score !=0) delay /= 2;
-            }
-
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-            drawScore();
-            snaky.draw();
-            apple.draw();
-            timeOut = setTimeout(refreshCanvas, delay); // setTimeout fonction qui permet de relancer une fonction
-        }
-
-    }
-
-    const gameOver = () => {
-        ctx.save();
-        ctx.font = "bold 70px sans-serif";
-        ctx.fillStyle = "black";
-        ctx.textAlign = "center";
-        ctx.textBaseline ="middle";
-        ctx.strokeStyle = "white"
-        ctx.lineWidth = 5;
-        ctx.strokeText("Game over", xCenter, yCenter - 180);
-        ctx.fillText("Game over", xCenter, yCenter - 180);
-
-        ctx.font = "bold 30px sans-serif";
-        ctx.strokeText("Appuyer sur la touche Espace pour rejouer ", xCenter, yCenter - 120);
-        ctx.fillText("Appuyer sur la touche Espace pour rejouer ", xCenter, yCenter - 120);
-        ctx.restore();
-    }
-
-
-    const drawScore = () => {
-        ctx.save();
-        ctx.font = "bold 200px sans-serif";
-        ctx.fillStyle = "gray";
-        ctx.textAlign = "center";
-        ctx.textBaseline ="middle";
-        ctx.fillText(score.toString(), xCenter, yCenter );
-        ctx.restore();
-    }
-
-    const drawBlock = (ctx, position ) => {
-        // const x = position[0] * blockSize;
-        // const y = position[1] * blockSize;
-
-        const [x, y] = position;                                        //Ajout du destructuring
-        ctx.fillRect(x*blockSize, y*blockSize, blockSize, blockSize)    //Ajout du destructuring
-    }
-
     class Snake {
         constructor(direction, ...body){
             this.body = body;
@@ -110,16 +24,6 @@ window.onload = () => {
             this.ateApple = false;
         }
  
-        draw(){
-            ctx.save();
-            ctx.fillStyle = "#ff0000";
-            for(let block of this.body){
-                drawBlock(ctx, block);
-            }
-            ctx.restore();
-        };
-
-       
 
         advance(){
             const nextPosition = this.body[0].slice(); //   fait une copie du premier élement du tableau nextPosition = [6,4]
@@ -254,6 +158,120 @@ window.onload = () => {
             return isOnSnake;
         };
     }
+
+    class Drawing{
+        static gameOver(ctx, xCenter, yCenter,  ){
+            ctx.save();
+            ctx.font = "bold 70px sans-serif";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.textBaseline ="middle";
+            ctx.strokeStyle = "white"
+            ctx.lineWidth = 5;
+            ctx.strokeText("Game over", xCenter, yCenter - 180);
+            ctx.fillText("Game over", xCenter, yCenter - 180);
+    
+            ctx.font = "bold 30px sans-serif";
+            ctx.strokeText("Appuyer sur la touche Espace pour rejouer ", xCenter, yCenter - 120);
+            ctx.fillText("Appuyer sur la touche Espace pour rejouer ", xCenter, yCenter - 120);
+            ctx.restore();
+        }
+
+        static drawScore(ctx, xCenter, yCenter, score){
+            ctx.save();
+            ctx.font = "bold 200px sans-serif";
+            ctx.fillStyle = "gray";
+            ctx.textAlign = "center";
+            ctx.textBaseline ="middle";
+            ctx.fillText(score.toString(), xCenter, yCenter );
+            ctx.restore();
+        }
+        
+        static drawBlock(ctx, position,blockSize){
+            // const x = position[0] * blockSize;
+            // const y = position[1] * blockSize;
+    
+            const [x, y] = position;                                        //Ajout du destructuring
+            ctx.fillRect(x*blockSize, y*blockSize, blockSize, blockSize)    //Ajout du destructuring
+        }
+
+
+        static drawSnack(ctx, blockSize, snake){
+            ctx.save();
+            ctx.fillStyle = "#ff0000";
+            for(let block of snake.body){
+                this.drawBlock(ctx, block,blockSize);
+            }
+            ctx.restore();
+        }
+
+        static drawApple(ctx, blockSize, apple){
+            const radius = blockSize/2;
+            const x = apple.position[0]*blockSize + radius;
+            const y = apple.position[1]*blockSize + radius;
+            ctx.save();
+            ctx.fillStyle="#33cc33";
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI*2, true);
+            ctx.fill();
+            ctx.restore();
+
+        }
+
+    }
+    
+
+
+    const init = () => {
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        canvas.style.border = "30px solid grey";
+        canvas.style.margin = "50px auto";
+        canvas. style.display = "block";
+        canvas.style.backgroundColor = "#ddd";
+        document.body.appendChild(canvas);
+
+        launch();
+        //refreshCanvas();
+    }
+
+    
+
+    const launch = () =>{
+        snaky = new Snake('right', [5,4] , [4,4], [3,4], [2,4]);
+        apple = new Apple();
+        score = 0;
+        delay = 100; 
+        clearTimeout(timeOut); // fonction qui remet setTimeout à 0
+        refreshCanvas();
+    }
+
+    const refreshCanvas = () => {
+
+        snaky.advance();
+        if(snaky.checkCollision()){
+            Drawing.gameOver(ctx, xCenter, yCenter);
+        }else{
+    
+            if(snaky.isEatingeApple(apple)){
+                score++;
+                do{
+                    apple.setNewPosition();
+                    
+                }while( apple.isOnSnake(snaky));
+
+                if(score%5 === 0 &&  score !=0) delay /= 2;
+            }
+
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            Drawing.drawScore(ctx, xCenter, yCenter, score);
+            Drawing.drawSnack(ctx, blockSize, snaky);
+            Drawing.drawApple(ctx, blockSize, apple)
+            timeOut = setTimeout(refreshCanvas, delay); // setTimeout fonction qui permet de relancer une fonction
+        }
+
+    }
+
 
     document.onkeydown = e =>{
         const key = e.keyCode;
